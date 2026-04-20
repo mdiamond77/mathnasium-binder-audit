@@ -1,1 +1,9 @@
-[]
+[
+  {
+    "timestamp": "2026-04-20T01:50:35Z",
+    "trigger": "auto",
+    "month": "2026-04",
+    "success": false,
+    "error": "Traceback (most recent call last):\n  File \"/home/runner/work/mathnasium-binder-audit/mathnasium-binder-audit/main.py\", line 39, in main\n    paths = download_reports(month_label)\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/mathnasium-binder-audit/mathnasium-binder-audit/download.py\", line 70, in download_reports\n    _login(page)\n  File \"/home/runner/work/mathnasium-binder-audit/mathnasium-binder-audit/download.py\", line 16, in _login\n    raise EnvironmentError(\"RADIUS_USERNAME and RADIUS_PASSWORD environment variables must be set.\")\nOSError: RADIUS_USERNAME and RADIUS_PASSWORD environment variables must be set.\n"
+  }
+]
