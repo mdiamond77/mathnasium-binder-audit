@@ -4,9 +4,18 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 from config import CENTERS, CC_RECIPIENT
+from process import STATUS_NEVER, STATUS_60, STATUS_90, STATUS_120
 
-COLS = ["student_name", "last_progress_check", "last_assessment", "days_since", "status", "reason"]
-HEADERS = ["Student Name", "Last Progress Check", "Last Assessment", "Days Since Last Milestone", "Status", "Reason"]
+COLS = ["student_name", "last_progress_check", "last_assessment", "days_since"]
+HEADERS = ["Student Name", "Last Progress Check", "Last Assessment", "Days Since Last Milestone"]
+
+BUCKET_ORDER = [STATUS_120, STATUS_90, STATUS_60, STATUS_NEVER]
+BUCKET_STYLES = {
+    STATUS_120: "color:#c0392b;",
+    STATUS_90:  "color:#e67e22;",
+    STATUS_60:  "color:#2980b9;",
+    STATUS_NEVER: "color:#7f8c8d;",
+}
 
 
 def _th(text: str) -> str:
@@ -19,17 +28,27 @@ def _td(text: str) -> str:
 
 def _table(rows: list[dict]) -> str:
     header_html = "".join(_th(h) for h in HEADERS)
-    if rows:
-        body_html = "".join(
-            "<tr>" + "".join(_td(row.get(c, "")) for c in COLS) + "</tr>"
-            for row in rows
-        )
-    else:
-        body_html = "<tr><td colspan='{}' style='color:#888;font-style:italic;padding:6px 12px;'>No students flagged.</td></tr>".format(len(HEADERS))
+    body_html = "".join(
+        "<tr>" + "".join(_td(row.get(c, "")) for c in COLS) + "</tr>"
+        for row in rows
+    )
     return (
         "<table style='border-collapse:collapse;font-family:Arial,sans-serif;font-size:14px;'>"
         "<tr>{}</tr>{}</table>"
     ).format(header_html, body_html)
+
+
+def _sections(rows: list[dict]) -> str:
+    by_bucket = {b: [r for r in rows if r["status"] == b] for b in BUCKET_ORDER}
+    html = ""
+    for bucket in BUCKET_ORDER:
+        bucket_rows = by_bucket[bucket]
+        if not bucket_rows:
+            continue
+        style = BUCKET_STYLES[bucket]
+        html += "<h3 style='margin-top:24px;margin-bottom:8px;{}'>{}</h3>".format(style, bucket)
+        html += _table(bucket_rows)
+    return html
 
 
 def build_html(center_name: str, month_label: str, rows: list[dict]) -> str:
@@ -39,10 +58,10 @@ def build_html(center_name: str, month_label: str, rows: list[dict]) -> str:
             "<p>Hi Team,</p>"
             "<p>Below is your binder audit list of active students who have not had a recent "
             "progress check or assessment. Please review and take any needed action.</p>"
-            "{divider}{table}{divider}"
+            "{divider}{sections}{divider}"
             "<p style='color:#999;font-size:12px;'><em>This email sends automatically on the 15th of each month. "
             "Questions? Contact matt.diamond@mathnasium.com.</em></p>"
-        ).format(divider=divider, table=_table(rows))
+        ).format(divider=divider, sections=_sections(rows))
     else:
         body = (
             "<p>Hi Team,</p>"

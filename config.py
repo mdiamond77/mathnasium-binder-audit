@@ -18,5 +18,6 @@ COL_ENROLLMENT          = "Enrollment Status"
 COL_CENTER              = "Center"
 COL_LAST_PROGRESS_CHECK = "Last Progress Check"
 COL_LAST_ASSESSMENT     = "Last Assessment"
+COL_LAST_ATTENDANCE     = "Last Attendance"
 
 THRESHOLD_DAYS = 60

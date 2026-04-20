@@ -9,6 +9,7 @@ from config import (
     COL_CENTER,
     COL_LAST_PROGRESS_CHECK,
     COL_LAST_ASSESSMENT,
+    COL_LAST_ATTENDANCE,
     CENTERS,
     THRESHOLD_DAYS,
 )
@@ -54,6 +55,11 @@ def process(student_report_path: Path, today: date = None) -> dict:
     # Parse date columns
     df[COL_LAST_PROGRESS_CHECK] = pd.to_datetime(df[COL_LAST_PROGRESS_CHECK], errors="coerce")
     df[COL_LAST_ASSESSMENT]     = pd.to_datetime(df[COL_LAST_ASSESSMENT],     errors="coerce")
+    df[COL_LAST_ATTENDANCE]     = pd.to_datetime(df[COL_LAST_ATTENDANCE],     errors="coerce")
+
+    # Exclude students whose last attendance was more than 2 months ago
+    cutoff = pd.Timestamp(today) - pd.DateOffset(months=2)
+    df = df[df[COL_LAST_ATTENDANCE].isna() | (df[COL_LAST_ATTENDANCE] >= cutoff)].copy()
 
     # Compute most recent milestone date
     df["most_recent_date"] = df[[COL_LAST_PROGRESS_CHECK, COL_LAST_ASSESSMENT]].max(axis=1)
