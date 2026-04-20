@@ -84,7 +84,7 @@ def process(student_report_path: Path, today: date = None) -> dict:
 
     df["pc_display"]    = df[COL_LAST_PROGRESS_CHECK].apply(fmt_date)
     df["assess_display"] = df[COL_LAST_ASSESSMENT].apply(fmt_date)
-    df["days_display"]  = df["days_since"].apply(lambda d: str(int(d)) if d is not None else "")
+    df["days_display"]  = df["days_since"].apply(lambda d: str(int(d)) if pd.notna(d) else "")
 
     center_data = {}
     for center_name in CENTERS:
