@@ -37,7 +37,7 @@ def _assign_status(days: int | None) -> str:
 
 
 def _reason(days: int | None, status: str) -> str:
-    if status == STATUS_NEVER:
+    if status == STATUS_NEVER or days is None or (isinstance(days, float) and pd.isna(days)):
         return "No recorded progress check or assessment — Never assessed"
     return "No milestone in {} days — {}".format(int(days), status)
 
